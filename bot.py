@@ -41,7 +41,7 @@ class FTKBot(commands.Bot):
         print(f'Logged as: {self.user} (ID: {self.user.id})')
 
         if self.call_once:
-            self.error_log = self.get_user(self.owner_id)
+            self.error_log = await self.fetch_user(428483942329614336)
             self.call_once = False
     
     async def on_slash_command_error(self, interaction: disnake.ApplicationCommandInteraction, exception: commands.CommandError) -> None:
