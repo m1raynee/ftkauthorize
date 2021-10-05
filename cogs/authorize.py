@@ -55,14 +55,16 @@ class Authorize(commands.Cog, name='Авторизация'):
             future_roles.append(disnake.Object(764460025908690944))
         else:
             future_roles.append(disnake.Object(708966006189719562))
-        if data['is_admin']:
-            future_roles.append(disnake.Object(706868671196168242))
 
         await inter.user.edit(
             nick=data['name'],
             roles=future_roles
         )
         await inter.response.send_message(f'Вы были авторизованы как {data["name"]}')
+
+    @authorize.sub_command()
+    async def info(self, inter: disnake.ApplicationCommandInteraction):
+        ...
 
 
 def setup(bot):
