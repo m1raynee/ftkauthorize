@@ -22,7 +22,11 @@ exts = (
 
 class FTKBot(commands.Bot):
     def __init__(self):
-        super().__init__(commands.when_mentioned_or('?'), test_guilds=APP_COMMAND_GUILDS)
+        super().__init__(
+            commands.when_mentioned_or('?'),
+            test_guilds=APP_COMMAND_GUILDS,
+            intents=disnake.Intents.all()
+        )
 
         self.http_session = aiohttp.ClientSession(loop=self.loop)
 
