@@ -27,6 +27,7 @@ class FTKBot(commands.Bot):
             test_guilds=APP_COMMAND_GUILDS,
             intents=disnake.Intents.all()
         )
+        self.call_once = True
 
         self.http_session = aiohttp.ClientSession(loop=self.loop)
 
@@ -35,10 +36,13 @@ class FTKBot(commands.Bot):
                 self.load_extension(ext)
             except Exception as e:
                 print(f'Could not load extension {ext} due to {e.__class__.__name__}: {e}')
-        self.error_log = self.get_user(self.owner_id or 428483942329614336)
     
     async def on_ready(self):
         print(f'Logged as: {self.user} (ID: {self.user.id})')
+
+        if self.call_once:
+            self.error_log = self.get_user(self.owner_id)
+            self.call_once = False
     
     async def on_slash_command_error(self, interaction: disnake.ApplicationCommandInteraction, exception: commands.CommandError) -> None:
         if interaction.response.is_done():
