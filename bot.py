@@ -25,6 +25,12 @@ class FTKBot(commands.Bot):
         super().__init__(commands.when_mentioned_or('?'), test_guilds=APP_COMMAND_GUILDS)
 
         self.http_session = aiohttp.ClientSession(loop=self.loop)
+
+        for ext in exts:
+            try:
+                self.load_extension(ext)
+            except Exception as e:
+                print(f'Could not load extension {ext} due to {e.__class__.__name__}: {e}')
     
     async def on_ready(self):
         print(f'Logged as: {self.user} (ID: {self.user.id})')
