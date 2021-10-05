@@ -61,10 +61,13 @@ class Authorize(commands.Cog, name='Авторизация'):
             roles=future_roles
         )
         await inter.response.send_message(f'Вы были авторизованы как {data["name"]}')
+        try:
+            await inter.user.send(f'Вы были авторизованы как {data["name"]}')
+        except: pass
 
     @authorize.sub_command()
     async def info(self, inter: disnake.ApplicationCommandInteraction):
-        ...
+        await inter.response.send_message('В скором времени будет добавлено', ephemeral=True)
 
 
 def setup(bot):
