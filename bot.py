@@ -16,6 +16,10 @@ APP_COMMAND_GUILDS = (
     705650591006982235,
 )
 
+exts = (
+    'cogs.authorize'
+)
+
 class FTKBot(commands.Bot):
     def __init__(self):
         super().__init__(commands.when_mentioned_or('?'))
