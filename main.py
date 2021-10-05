@@ -1,4 +1,4 @@
 from bot import FTKBot
 import config
 
-FTKBot().run(config.token)
+FTKBot().run(config.TOKEN)
