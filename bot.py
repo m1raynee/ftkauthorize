@@ -31,6 +31,7 @@ class FTKBot(commands.Bot):
                 self.load_extension(ext)
             except Exception as e:
                 print(f'Could not load extension {ext} due to {e.__class__.__name__}: {e}')
+        self.error_log = self.get_user(self.owner_id or 428483942329614336)
     
     async def on_ready(self):
         print(f'Logged as: {self.user} (ID: {self.user.id})')
@@ -49,7 +50,7 @@ class FTKBot(commands.Bot):
             content = f'Произошла непредвиденная ошибка, свяжитесь с администратором и предоставьте код {now}'
             await m(content, ephemeral=True)
             tb = '\n'.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
-            await self.owner.send((
+            await self.error_log.send((
                 '```py\n'
                 f'{interaction.user = }\n'
                 f'{interaction.channel.id = }\n'
@@ -57,13 +58,13 @@ class FTKBot(commands.Bot):
                 f'{interaction.options = }\n'
                 '```'
             ))
-            await self.owner.send(**(await safe_send_prepare(f'```py\n{tb}\n```')))
+            await self.error_log.send(**(await safe_send_prepare(f'```py\n{tb}\n```')))
 
         else:
             return await super().on_slash_command_error(interaction, exception)
 
     async def on_error(self, event_method: str, *args, **kwargs) -> None:
-        await self.owner.send((
+        await self.error_log.send((
                 '```py\n'
                 f'{event_method = }\n'
                 f'{args = }\n'
@@ -71,4 +72,4 @@ class FTKBot(commands.Bot):
                 '```'
             ))
         tb = traceback.format_exc()
-        await self.owner.send(**(await safe_send_prepare(f'```py\n{tb}\n```')))
+        await self.error_log.send(**(await safe_send_prepare(f'```py\n{tb}\n```')))
