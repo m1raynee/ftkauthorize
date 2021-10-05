@@ -17,7 +17,7 @@ APP_COMMAND_GUILDS = (
 )
 
 exts = (
-    'cogs.authorize'
+    'cogs.authorize',
 )
 
 class FTKBot(commands.Bot):
