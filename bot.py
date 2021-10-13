@@ -36,7 +36,8 @@ class FTKBot(commands.Bot):
             try:
                 self.load_extension(ext)
             except Exception as e:
-                print(f'Could not load extension {ext} due to {e.__class__.__name__}: {e}')
+                t = traceback.format_exception(None, e, e.__traceback__)
+                print(f'Could not load extension {ext} due to {e.__class__.__name__}: {e}\n{t}')
     
     async def on_ready(self):
         print(f'Logged as: {self.user} (ID: {self.user.id})')
