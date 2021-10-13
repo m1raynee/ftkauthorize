@@ -18,6 +18,7 @@ APP_COMMAND_GUILDS = (
 
 exts = (
     'cogs.authorize',
+    'jishaku'
 )
 
 class FTKBot(commands.Bot):
