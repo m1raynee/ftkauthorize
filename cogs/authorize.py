@@ -80,15 +80,23 @@ class Authorize(commands.Cog, name='Авторизация'):
     @authorize.sub_command()
     async def info(self, inter: disnake.ApplicationCommandInteraction):
         """Информация об авторизации"""
-        await inter.response.send_message('Информационное сообщение', view=self.link_view, ephemeral=True)
+        view = Linked(
+            'https://discord.com/channels/705650591006982235/777259995334311966/897917001408864286',
+            'Перейти к инструкции'
+        )
+        await inter.response.send_message('Информационное сообщение', view=view, ephemeral=True)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: disnake.Member):
+        view = Linked(
+            'https://discord.com/channels/705650591006982235/777259995334311966/897917001408864286',
+            'Перейти к инструкции'
+        )
         try:
-            await member.send('Пройдите авторизацию на сервере', view=self.link_view)
+            await member.send('Пройдите авторизацию на сервере', view=view)
         except:
             dest = self.bot.get_partial_messageable(AUTHORIZATION_CHANNEL_ID)
-            await dest.send('Пройдите авторизацию на сервере', view=self.link_view)
+            await dest.send('Пройдите авторизацию на сервере', view=view)
 
 
 def setup(bot):
