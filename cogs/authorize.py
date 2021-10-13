@@ -23,10 +23,6 @@ class AuthorizeError(BotException):
 class Authorize(commands.Cog, name='Авторизация'):
     def __init__(self, bot):
         self.bot = bot  # type: FTKBot
-        self.link_view = Linked(
-            'https://discord.com/channels/705650591006982235/777259995334311966/897917001408864286',
-            'Перейти к сообщению'
-        )
     
     @commands.slash_command()
     async def authorize(*_):
