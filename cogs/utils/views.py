@@ -11,3 +11,4 @@ class Linked(ui.View):
                 url=link
             )
         )
+        self.stop()

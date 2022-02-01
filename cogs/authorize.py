@@ -15,47 +15,37 @@ ENDPOINT = 'https://ftk-sut.ru/api/discord/invite?user={0}&signature={1}'
 AUTHORIZATION_CHANNEL_ID = 777259995334311966
 SIGNATURE_REGEX = re.compile(r'[a-z0-9]{64}')
 
-
-class AuthorizeError(BotException):
-    def __init__(self, message) -> None:
-        super().__init__(f'Ошибка авторизации: {message}')
+class InvalidCode(BotException):
+    def __init__(self) -> None:
+        super().__init__('Ошибка авторизации: Неверный ключ-код')
 
 class Authorize(commands.Cog, name='Авторизация'):
     def __init__(self, bot):
         self.bot = bot  # type: FTKBot
     
     @commands.slash_command()
-    async def authorize(*_):
-        pass
-    
-    @authorize.sub_command()
-    async def process(
-        self,
-        inter: disnake.ApplicationCommandInteraction,
-        code: str
-    ):
-        """
-        Авторизация
+    async def authorize(self, inter: disnake.ApplicationCommandInteraction, code: str):
+        """Авторизация
 
         Parameters
         ----------
-        code: Код для авторизации. Информация: /autorize info
+        code: Код для авторизации, который можно найти на сайте.
         """
         user_id, signature = code.split('.', 1)
 
         if not user_id.isdigit():
-            raise AuthorizeError(f'ID "{user_id}" не является числом')
+            raise InvalidCode()
         user_id = int(user_id)
 
         match = re.match(SIGNATURE_REGEX, signature)
 
         if not match:
-            raise AuthorizeError(f'Подпись недействительна')
+            raise InvalidCode()
         signature = match.group(0)
 
         async with self.bot.http_session.get(ENDPOINT.format(user_id, signature)) as resp:
             if resp.status != 200:
-                raise AuthorizeError(resp.reason)
+                raise InvalidCode()
             data = await resp.json(encoding='utf-8')
         
         future_roles = inter.user.roles
@@ -64,23 +54,15 @@ class Authorize(commands.Cog, name='Авторизация'):
         else:
             future_roles.append(disnake.Object(708966006189719562))
 
-        await inter.user.edit(
+        await inter.author.edit(
             nick=data['name'],
             roles=future_roles
         )
-        await inter.response.send_message(f'Вы были авторизованы как {data["name"]}')
+        await inter.response.send_message(f'{inter.author.name} теперь {data["name"]}')
         try:
             await inter.author.send(f'Вы были авторизованы как {data["name"]}')
-        except: pass
-
-    @authorize.sub_command()
-    async def info(self, inter: disnake.ApplicationCommandInteraction):
-        """Информация об авторизации"""
-        view = Linked(
-            'https://discord.com/channels/705650591006982235/777259995334311966/897917001408864286',
-            'Перейти к инструкции'
-        )
-        await inter.response.send_message('Информационное сообщение', view=view, ephemeral=True)
+        except disnake.HTTPException:
+            pass
 
     @commands.Cog.listener()
     async def on_member_join(self, member: disnake.Member):
@@ -90,7 +72,7 @@ class Authorize(commands.Cog, name='Авторизация'):
         )
         try:
             await member.send('Пройдите авторизацию на сервере', view=view)
-        except:
+        except disnake.HTTPException:
             dest = self.bot.get_partial_messageable(AUTHORIZATION_CHANNEL_ID)
             await dest.send('Пройдите авторизацию на сервере', view=view)
 

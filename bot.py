@@ -16,7 +16,7 @@ APP_COMMAND_GUILDS = (
     705650591006982235,
 )
 
-exts = (
+init_exts = (
     'cogs.authorize',
     'jishaku'
 )
@@ -32,7 +32,7 @@ class FTKBot(commands.Bot):
 
         self.http_session = aiohttp.ClientSession(loop=self.loop)
 
-        for ext in exts:
+        for ext in init_exts:
             try:
                 self.load_extension(ext)
             except Exception as e:
@@ -47,39 +47,31 @@ class FTKBot(commands.Bot):
             self.call_once = False
     
     async def on_slash_command_error(self, interaction: disnake.ApplicationCommandInteraction, exception: commands.CommandError) -> None:
-        if interaction.response.is_done():
-            m = interaction.followup.send
-        else:
-            m = interaction.response.send_message
-
         if isinstance(exception, BotException):
-            return await m(exception.message, ephemeral=True)
+            return await interaction.send(exception.message, ephemeral=True)
 
-        elif not interaction.application_command.has_error_handler() or interaction.application_command.cog.has_slash_error_handler():
-            now = disnake.utils.utcnow().timestamp()
-            content = f'Произошла непредвиденная ошибка, свяжитесь с администратором и предоставьте код {now}'
-            await m(content, ephemeral=True)
-            tb = '\n'.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
-            await self.error_log.send((
-                '```py\n'
-                f'{interaction.user = }\n'
-                f'{interaction.channel.id = }\n'
-                f'{interaction.application_command.name = }\n'
-                f'{interaction.options = }\n'
-                '```'
-            ))
-            await self.error_log.send(**(await safe_send_prepare(f'```py\n{tb}\n```')))
+        now = disnake.utils.utcnow().timestamp()
+        content = f'Произошла непредвиденная ошибка, свяжитесь с администратором и предоставьте код {now}'
+        await interaction.send(content, ephemeral=True)
+        tb = '\n'.join(traceback.format_exception(type(exception), exception, exception.__traceback__))
+        await self.error_log.send((
+            '```py\n'
+            f'{interaction.user = }\n'
+            f'{interaction.channel_id = }\n'
+            f'{interaction.application_command.name = }\n'
+            f'{interaction.options = }\n'
+            '```'
+        ))
+        await self.error_log.send(**safe_send_prepare(f'```py\n{tb}\n```'))
 
-        else:
-            return await super().on_slash_command_error(interaction, exception)
 
     async def on_error(self, event_method: str, *args, **kwargs) -> None:
         await self.error_log.send((
-                '```py\n'
-                f'{event_method = }\n'
-                f'{args = }\n'
-                f'{kwargs = }\n'
-                '```'
-            ))
+            '```py\n'
+            f'{event_method = }\n'
+            f'{args = }\n'
+            f'{kwargs = }\n'
+            '```'
+        ))
         tb = traceback.format_exc()
-        await self.error_log.send(**(await safe_send_prepare(f'```py\n{tb}\n```')))
+        await self.error_log.send(**safe_send_prepare(f'```py\n{tb}\n```'))

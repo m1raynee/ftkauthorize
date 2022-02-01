@@ -1,4 +1,8 @@
 from bot import FTKBot
-import config
+import os
 
-FTKBot().run(config.TOKEN)
+if 'DISCORD_TOKEN' in os.environ:
+    from dotenv import load_dotenv
+    load_dotenv()
+
+FTKBot().run(os.environ['DISCORD_TOKEN'])
