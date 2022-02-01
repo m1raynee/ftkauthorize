@@ -48,16 +48,12 @@ class Authorize(commands.Cog, name='Авторизация'):
                 raise InvalidCode()
             data = await resp.json(encoding='utf-8')
         
-        future_roles = inter.user.roles
         if data['is_teacher']:
-            future_roles.append(disnake.Object(764460025908690944))
+            await inter.author.add_roles(disnake.Object(764460025908690944))
         else:
-            future_roles.append(disnake.Object(708966006189719562))
+            await inter.author.add_roles(disnake.Object(708966006189719562))
 
-        await inter.author.edit(
-            nick=data['name'],
-            roles=future_roles
-        )
+        await inter.author.edit(nick=data['name'])
         await inter.response.send_message(f'{inter.author.name} теперь {data["name"]}')
         try:
             await inter.author.send(f'Вы были авторизованы как {data["name"]}')
