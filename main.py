@@ -1,7 +1,7 @@
 from bot import FTKBot
 import os
 
-if 'DISCORD_TOKEN' in os.environ:
+if 'DISCORD_TOKEN' not in os.environ:
     from dotenv import load_dotenv
     load_dotenv()
 
